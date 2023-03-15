@@ -2,20 +2,19 @@ import { CronJob } from "cron";
 import { getETHBalance } from "./getETHBalance";
 import { sendETH } from "./sendETH";
 
-new CronJob(
-  "0 8 * * *",
-  async () => {
-    try {
-      console.log("Running!");
+const moveFunds = async () => {
+  try {
+    console.log("Running!");
 
-      const ethBalance = await getETHBalance();
+    const ethBalance = await getETHBalance();
 
-      await sendETH(ethBalance);
-    } catch (error: any) {
-      console.log("Something went wrong:", error);
-    }
-  },
-  null,
-  true,
-  "America/Chicago"
-);
+    await sendETH(ethBalance);
+  } catch (error: any) {
+    console.log(
+      "Something went wrong:",
+      error?.response?.data?.errors || error
+    );
+  }
+};
+
+new CronJob("0 8 * * *", moveFunds, null, true, "America/Chicago");
