@@ -1,13 +1,11 @@
 {
   "name": "coinbase-auto-withdraw",
-  "version": "1.0.0",
-  "description": "",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "start": "node --es-module-specifier-resolution=node dist/index.js"
   },
-  "author": "",
+  "author": "JP Angelle",
   "license": "ISC",
   "dependencies": {
     "@types/cron": "^2.0.0",
