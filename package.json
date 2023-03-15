@@ -6,7 +6,7 @@
     "start": "node --es-module-specifier-resolution=node dist/index.js"
   },
   "author": "JP Angelle",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@types/cron": "^2.0.0",
     "@types/node": "^18.15.3",
