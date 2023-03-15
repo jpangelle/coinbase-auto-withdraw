@@ -19,5 +19,7 @@ export const sendETH = async (ethBalance: string) => {
     },
   });
 
-  await axios(payload);
+  const { data } = await axios(payload);
+
+  return data.data;
 };

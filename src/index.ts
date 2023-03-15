@@ -1,20 +1,47 @@
-import { CronJob } from "cron";
+import { Cron } from "croner";
+import BigNumber from "bignumber.js";
 import { getETHBalance } from "./getETHBalance";
 import { sendETH } from "./sendETH";
+import { getLatestETHBuy } from "./getLatestETHBuy";
+import { pollETHTransactionStatus } from "./pollETHTransactionStatus";
+import { Sentry } from "./sentry";
 
 const moveFunds = async () => {
   try {
-    console.log("Running!");
+    Sentry.captureMessage("Running!");
 
+    const latestETHBuy = await getLatestETHBuy();
     const ethBalance = await getETHBalance();
 
-    await sendETH(ethBalance);
-  } catch (error: any) {
-    console.log(
-      "Something went wrong:",
-      error?.response?.data?.errors || error
-    );
+    if (
+      latestETHBuy?.status === "completed" &&
+      ethBalance.gte(new BigNumber(latestETHBuy.amount.amount))
+    ) {
+      Sentry.captureMessage("Sending!");
+
+      const estimatedNetworkFee = new BigNumber("0.001");
+
+      const ethBalanceMinusEstimatedNetworkFee = ethBalance
+        .minus(estimatedNetworkFee)
+        .toString();
+      const { id, status } = await sendETH(ethBalanceMinusEstimatedNetworkFee);
+      if (status === "pending") {
+        Sentry.captureMessage("Pending!");
+
+        await pollETHTransactionStatus(id);
+      }
+    } else {
+      Sentry.captureMessage("Nothing to send!");
+    }
+  } catch (error) {
+    Sentry.captureException(error);
   }
 };
 
-new CronJob("0 8 * * *", moveFunds, null, true, "America/Chicago");
+Cron(
+  "*/30 * * * *",
+  {
+    timezone: "America/Chicago",
+  },
+  moveFunds
+);
