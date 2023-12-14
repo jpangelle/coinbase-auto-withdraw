@@ -9,9 +9,12 @@ const ethereumAccountId = process.env.ETHEREUM_ACCOUNT_ID;
 export const getLatestETHBuy = async () => {
   const payload = constructPayload({
     method: "GET",
-    path: `/v2/accounts/${ethereumAccountId}/buys`,
+    path: `/v2/accounts/${ethereumAccountId}/transactions?status=completed&type=buy`,
   });
 
-  const { data } = await axios(payload);
-  return data.data[0];
+  const {
+    data: { data: completedBuyTransactions },
+  } = await axios(payload);
+
+  return completedBuyTransactions[0];
 };

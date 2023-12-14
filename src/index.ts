@@ -14,7 +14,7 @@ const moveFunds = async () => {
     const ethBalance = await getETHBalance();
 
     if (
-      latestETHBuy?.status === "completed" &&
+      latestETHBuy &&
       ethBalance.gte(new BigNumber(latestETHBuy.amount.amount))
     ) {
       Sentry.captureMessage("Sending!");
